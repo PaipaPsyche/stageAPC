@@ -1,0 +1,12 @@
+Size of DAT000001 : 68 KB 
+Size of DAT000001.dbase : 2 KB 
+Size of DAT000001.long : 8 KB 
+Size of DAT000002 : 2286 KB 
+Size of DAT000002.dbase : 2 KB 
+Size of DAT000002.long : 76 KB 
+Size of DAT000003 : 24016 KB 
+Size of DAT000003.dbase : 2 KB 
+Size of DAT000003.long : 759 KB 
+Size of DAT000004 : 310183 KB 
+Size of DAT000004.dbase : 2 KB 
+Size of DAT000004.long : 7590 KB 

@@ -1,0 +1,4 @@
+Total of 1535 seconds elapsed for inputs/MONIIN1000.txt
+Total of 131 seconds elapsed for inputs/MONIIN100.txt
+Total of 19 seconds elapsed for inputs/MONIIN10.txt
+Total of 8 seconds elapsed for inputs/MONIIN1.txt
