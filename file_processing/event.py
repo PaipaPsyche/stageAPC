@@ -57,7 +57,7 @@ def event_summary(events):
 # df   return dataframe (return dict list if false)
 # max_sghower  maximum number of showers to process
 # gen__pckl  generate pkl file with particle data (binary file)
-def file_to_events(f,dictID,df=True,max_shower=None,gen__pckl=False):
+def file_to_events(f,dictID,E_th=None,df=True,max_shower=None,gen__pckl=False):
 
 
     p_obj = [] #saving particles as objects (dictionaries)
@@ -102,6 +102,9 @@ def file_to_events(f,dictID,df=True,max_shower=None,gen__pckl=False):
 
                 # E2 = p2 + m2
                 E = np.sqrt(px[i]**2+py[i]**2+pz[i]**2+particle[2]**2)
+                if(E_th and E<E_th):
+                    pass
+
 
                 particle_object = {
                     "event":shower_count,

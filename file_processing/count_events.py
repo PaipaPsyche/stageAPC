@@ -49,7 +49,8 @@ def main():
     #LOAD photon shower
     in_file = in_dir+'DAT000001'
     f_ph=CorsikaParticleFile(in_file)
-    events_ph = lhaaso_sim.file_to_events(f_ph,dictID)#,gen__pckl=out_dir+"ph250.pkl")
+    #Energy Thresshold in Gev
+    events_ph = lhaaso_sim.file_to_events(f_ph,dictID,E_th = 0.003)#,gen__pckl=out_dir+"ph250.pkl")
     f_ph.close()
     print("created events_ph")
 
@@ -58,7 +59,7 @@ def main():
     #LOAD proton shower
     in_file = in_dir+'DAT000002'
     f_pr=CorsikaParticleFile(in_file)
-    events_pr =  lhaaso_sim.file_to_events(f_pr,dictID)#,gen__pckl=out_dir+"pr250.pkl")
+    events_pr =  lhaaso_sim.file_to_events(f_pr,dictID,E_th=1.3)#,gen__pckl=out_dir+"pr250.pkl")
     f_pr.close()
     print("created events_pr")
 
@@ -75,5 +76,5 @@ def main():
     e_pr = lhaaso_sim.lhaaso_evaluate_events(events_pr)
     fn_pr = lhaaso_sim.build_final(ev_pr,14)
     fn_pr.to_csv(out_dir+"final_pr.csv")
-    
+
 main()
