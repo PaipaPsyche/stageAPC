@@ -13,10 +13,14 @@ import collections as cll
 import multiprocessing as mp
 from event import *
 
+from itertools import compress
 #plot
 import matplotlib.pyplot as plt
 # import seaborn as sns
 
+
+#multiprocessing
+from multiprocessing import Pool, freeze_support, cpu_count
 
 
 
@@ -40,7 +44,7 @@ class detector:
         self.y1 = y+l/2
         self.l = l
         self.detectable = detectable;
-        self.history=[];
+        #self.history=[];
         self.E_th = E_th;
         self.detected = 0;
 
@@ -50,7 +54,7 @@ class detector:
     def inRange(self,event):
         if(event["x"]>self.x0 and event["x"]<self.x1 and event["y"]>self.y0 and event["y"]<self.y1):
             if(event["energy"] >= self.E_th and event["particle"] in self.detectable):
-                self.history.append(event)
+
                 return True
         return False
 
@@ -100,16 +104,15 @@ class detector_line:
     # if event in the range of one of the detectors in the line,
     #saves event in history and returns true. otherwise, returns false.
     def inRange(self,event):
-        registered = False
+
         if(len(self.detectors)>0):
 
             xs = np.argmin([np.abs(d.x-event["x"]) for d in self.detectors])
             d = self.detectors[xs]
-            if(d.inRange(event)):
-                registered=True
-                return registered
+            return d.inRange(event)
 
-        return registered
+
+
 
 
     def give_history(self):
@@ -143,7 +146,7 @@ class detector_triangular_grid:
         self.E_th = E_th
         self.name = name
         self.detector_lines = []
-        self.detected = 0
+        #self.history = []
         y_act = yo-ro
         count = 0
         n_det = 0
@@ -177,14 +180,7 @@ class detector_triangular_grid:
         return det
 
 
-    # returns a list with the history of detected particles
-    def give_history(self):
-        history = []
-        for dl in self.detector_lines:
-            for ev in dl.give_history():
-                ev["detected"]=self.name
-                history.append(ev)
-        return history
+
 
 
 
@@ -195,32 +191,37 @@ class detector_triangular_grid:
         registered = 0
         selected_idx = np.argmin(np.array([np.abs(dl.y-event["y"]) for dl in self.detector_lines]))
         d = self.detector_lines[selected_idx]
-        if(d.inRange(event)):
-            registered=1;
-        self.detected = self.detected + registered
-        return registered
+        return d.inRange(event)
 
 
 
     def process_events(self,events):
         # pre-selects the events that are above a defined energy threshold and
         # are among the detectable particles
-        events = list(events.T.to_dict().values())
-        useful_evs = [ev for ev in events if np.logical_and(ev["energy"]>=self.E_th,ev["particle"] in self.detectable)]
+        useful_evs = events.loc[np.logical_and(events["energy"]>=self.E_th,events["particle"].isin( self.detectable))]
+        useful_evs = list(useful_evs.T.to_dict().values())
         print(len(useful_evs)," particles within energy and type conditions")
 
-        # counter for detected particles
-        det = 0
-        for ev in useful_evs:
-            det += self.proc_single(ev) #process a single event, soring in detector memory
 
-        return det
+        # multiple thread processing
+        pool = Pool(cpu_count())
 
-    # delete  memory of detected particles
-    def blank(self):
-        self.detected = 0;
-        for d in self.detector_lines:
-            d.blank()
+        # for each particle event, check if detected
+        # returns a list of output (1 or 0) depending if detected or not
+        # returns the total of particles detected
+        results = pool.map(self.proc_single, useful_evs)
+
+
+        det = sum(results)
+        result_evs = list(compress(useful_evs,results))
+        #self.history = self.history + result_evs
+        return result_evs
+
+
+
+    # # delete  memory of detected particles
+    # def blank(self):
+    #     self.history =[]
 
 
 
@@ -231,16 +232,16 @@ class detector_triangular_grid:
            for d in dl.detectors:
                rect = plt.Rectangle((d.x0,d.y0),d.l,d.l,facecolor=f_color,edgecolor=e_color)
                plt.gca().add_patch(rect)
-
-    def plot_event(self,color,ref_value=10):
-        for dl in self.detector_lines:
-            for d in dl.detectors:
-                n_events = len(d.history)
-                n = n_events/ref_value if n_events<ref_value else 1
-                color_fc = (1,1,1) if n_events==0 else (1-n,1-n,1-n)
-                color_ec = (0.9,0.9,0.9) if n_events==0 else color
-                rect = plt.Rectangle((d.x0,d.y0),d.l,d.l,facecolor=color_fc,edgecolor=color_ec)
-                plt.gca().add_patch(rect)
+    #
+    # def plot_event(self,color,ref_value=10):
+    #     for dl in self.detector_lines:
+    #         for d in dl.detectors:
+    #             n_events = len(d.history)
+    #             n = n_events/ref_value if n_events<ref_value else 1
+    #             color_fc = (1,1,1) if n_events==0 else (1-n,1-n,1-n)
+    #             color_ec = (0.9,0.9,0.9) if n_events==0 else color
+    #             rect = plt.Rectangle((d.x0,d.y0),d.l,d.l,facecolor=color_fc,edgecolor=color_ec)
+    #             plt.gca().add_patch(rect)
 
 
 
@@ -254,13 +255,13 @@ AUXILIAR FUNCTIONS
 def evaluate_events(detectors,particles):
     evs = []
     for det in detectors: # for each detector grid
-        n = det.process_events(particles)  # n counts of particles in this detector
-        e = det.give_history() # particle list in the detector's history
+        e = det.process_events(particles)  # particle list in the detector's history
+        n = len(e)
         for ev in e: # for each particle
             ev["detector"] = det.name # set an attribute accounting detection
             evs.append(ev)
         print("{}: {} particles".format(det.name,n))
-    return evs
+    return pd.DataFrame(evs)
 
 
 

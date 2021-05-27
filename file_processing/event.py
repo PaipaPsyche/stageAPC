@@ -11,14 +11,9 @@ import numpy as np
 import pandas as pd
 import collections as cll
 import pickle as pkl
-
-
-
-
-# import multiprocessing as mp
-# def run_multiprocessing(func, i, n_processors):
-#     with mp.Pool(processes=n_processors) as pool:
-#         return pool.map(func, i)
+import time
+#multiprocessing
+#from multiprocessing import Pool, freeze_support, cpu_count
 
 
 
@@ -65,7 +60,6 @@ def file_to_events(f,dictID,E_th=None,df=True,max_shower=None,gen__pckl=False):
     #counters
     tot_par = 0 #total particles
     shower_count = 0 #total particle showers
-
 
     # for each shower
     for e in f:
