@@ -29,28 +29,16 @@ def main():
     in_dir = "in/"
     out_dir = "out/"
 
-    # sc_radius = 575
-    # sc_sep = 15*np.sqrt(3)/2
-    # sc_size = 1
-    # sc_detectable = ["photon"]
-    # sc_E_th = 0.003 #3 Mev
-    # scintillator_grid = lhaaso_sim.detector_triangular_grid(0,0,sc_radius,sc_sep,sc_size,sc_detectable,sc_E_th,name="em_scintillator_array")
-    #
-    # mu_radius = 575
-    # mu_sep = 30*np.sqrt(3)/2
-    # mu_size = 7
-    # mu_detectable = ["proton","neutron","mu+","mu-"]
-    # mu_E_th = 1.3 #1.3 Gev
-    # muon_grid = lhaaso_sim.detector_triangular_grid(7,0,mu_radius,mu_sep,mu_size,mu_detectable,mu_E_th,name="muon_detector_array")
-    #
+    # for each file asociate the content information
+    # [corsika  output file , output csv name, coriska  ID of prim particle]
 
 
-    files = [("DAT000001","200ph50Tev.csv",1],
-            ("DAT000002","200pr50Tev.csv",14],
-            ("DAT000003","200ph100Tev.csv",1],
-            ("DAT000004","200pr100Tev.csv",14],
-            ("DAT000005","200ph150Tev.csv",1],
-            ("DAT000006","200pr150Tev.csv",14]]
+    files = [["DAT000001","200ph50Tev.csv",1],
+            ["DAT000002","200pr50Tev.csv",14],
+            ["DAT000003","200ph100Tev.csv",1],
+            ["DAT000004","200pr100Tev.csv",14],
+            ["DAT000005","200ph150Tev.csv",1],
+            ["DAT000006","200pr150Tev.csv",14]]
 
 
     for tuple_n in files:
