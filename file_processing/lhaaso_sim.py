@@ -204,16 +204,21 @@ class detector_triangular_grid:
 
 
         # multiple thread processing
-        pool = Pool(cpu_count())
+        # pool = Pool(cpu_count())
+        #
+        # # for each particle event, check if detected
+        # # returns a list of output (1 or 0) depending if detected or not
+        # # returns the total of particles detected
+        # results = pool.map(self.proc_single, useful_evs)
 
-        # for each particle event, check if detected
-        # returns a list of output (1 or 0) depending if detected or not
-        # returns the total of particles detected
-        results = pool.map(self.proc_single, useful_evs)
+        results = []
+        for ev  in useful_evs:
+            results.append(self.proc_single(ev))
 
 
         det = sum(results)
         result_evs = list(compress(useful_evs,results))
+
         #self.history = self.history + result_evs
         return result_evs
 
@@ -283,7 +288,7 @@ def build_lhaaso():
     sc_radius = 575
     sc_sep = 15*np.sqrt(3)/2
     sc_size = 1
-    sc_detectable = ["photon"]
+    sc_detectable = ["photon","e+","e-"]
     sc_E_th = 0.003 #3 Mev
     scintillator_grid = detector_triangular_grid(0,0,sc_radius,sc_sep,sc_size,sc_detectable,sc_E_th,name="em_scintillator_array")
 
