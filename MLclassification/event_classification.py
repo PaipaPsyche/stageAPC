@@ -7,7 +7,7 @@ import pickle as pickle
 #learning
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix,f1_score
 
 
 
@@ -63,7 +63,7 @@ def error_assessment(y_test,y_pred,proton_tol=1E-4,photon_loss_tol=0.5,resol = 1
     if(not found):
         print("Warning! No minimal threshold conditions found in all the threshold sweep")
     else:
-        print("The best threshold is in {} where {}% of protons are misclassified and {}% of photons are miscalssified".format(ideal_th[0],round(ideal_th[1]*100,2),round(ideal_th[2]*100,2)))
+        print("The best threshold is in {} where {}% of PS are misclassified and {}% of GS are miscalssified".format(round(ideal_th[0],3),round(ideal_th[1]*100,3),round(ideal_th[2]*100,3)))
     return {
         "thresholds":thresholds,
         "protons_accepted":protons_passed,
@@ -85,10 +85,15 @@ class Logistic_probability_threshold:
 
 
 
-    def fit_model(self , xx , yy , test_s=0.3):
+    def fit_model(self , xx , yy , test_s=0.2):
 
         #splitting in train and test sample. the proportion of the test sample is set on "test_size"
-        x_train,x_test,y_train,y_test = train_test_split(xx,yy,test_size=test_s)
+        if(test_s==0):
+            x_train = x_test = xx
+            y_train = y_test = yy
+        else:
+            x_train,x_test,y_train,y_test = train_test_split(xx,yy,test_size=test_s)
+
         #train the model
         self.model.fit(x_train,y_train)
 
@@ -134,10 +139,14 @@ class Logistic_probability_threshold:
 
         pr_pass = fn/(fn+tp) # 1 -recall
         ph_pass = fp/(tn+fp) # 1 - specificity
-        print("{}% of protons are misclassified and {}% of photons are miscalssified".format(round(pr_pass*100,2),round(ph_pass*100,2)))
+        print("{}% of proton showers are misclassified and {}% of gamma showers are miscalssified".format(round(pr_pass*100,3),round(ph_pass*100,3)))
+
         acc = np.sum(y_pred == yy)/len(yy)
-        print("Total accuracy {}%".format(acc))
-        return [acc,pr_pass,ph_pass]
+        print("Total accuracy {}%".format(round(acc*100,4)))
+
+        f1 = f1_score(y_pred,yy)
+        print("F1 score {}".format(round(f1,4)))
+        return [acc,f1,pr_pass,ph_pass]
 
     def give_coefs(self):
 
