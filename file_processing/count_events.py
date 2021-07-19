@@ -69,12 +69,12 @@ def main():
 
 
     e_ph = lhaaso_sim.lhaaso_evaluate_events(events_ph)
-    fn_ph = lhaaso_sim.build_final(e_ph,1)
+    fn_ph = lhaaso_sim.build_final_df(e_ph,1)
     fn_ph.to_csv(out_dir+"final_ph.csv")
 
 
     e_pr = lhaaso_sim.lhaaso_evaluate_events(events_pr)
-    fn_pr = lhaaso_sim.build_final(ev_pr,14)
+    fn_pr = lhaaso_sim.build_final_df(ev_pr,14)
     fn_pr.to_csv(out_dir+"final_pr.csv")
 
 main()
